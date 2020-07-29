@@ -1,0 +1,23 @@
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database: postgresql
+    generate-ddl: true
+    show-sql: true
+  datasource:
+    platform: postgres
+    username: postgres
+    password: admin
+    url: jdbc:postgresql://localhost:5432/avocadodb?currentSchema=avocado
+  application:
+    name: avocado
+
+server:
+  port: 8080
+
+logging:
+  level:
+    org.springframework.web: debug
+    com.avocado: debug
