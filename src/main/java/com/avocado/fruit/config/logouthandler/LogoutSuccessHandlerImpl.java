@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
@@ -27,8 +28,9 @@ public class LogoutSuccessHandlerImpl implements LogoutSuccessHandler {
     @Override
     public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response,
                                 Authentication authentication) throws IOException {
-        String token = jwtUtil.extractTokenFromHeader(request);
-        if (token != null) {
+        Optional<String> optional = jwtUtil.extractTokenFromHeader(request);
+        if (optional.isPresent()) {
+            String token = optional.get();
             jwtService.deleteToken(token);
         }
         response.setStatus(HttpServletResponse.SC_OK);

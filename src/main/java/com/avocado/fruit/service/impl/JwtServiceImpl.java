@@ -1,6 +1,7 @@
 package com.avocado.fruit.service.impl;
 
 import com.avocado.fruit.exception.InvalidTokenException;
+import com.avocado.fruit.exception.config.ErrorCodes;
 import com.avocado.fruit.repository.JwtRepository;
 import com.avocado.fruit.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,6 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public Object getTokenSecretKey(String token) {
-        return jwtRepository.getTokenSecretKey(token).orElseThrow(() -> new InvalidTokenException("Invalid token"));
+        return jwtRepository.getTokenSecretKey(token).orElseThrow(() -> new InvalidTokenException("Invalid token", ErrorCodes.TOKEN_NOT_VALID));
     }
 }

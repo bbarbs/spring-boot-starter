@@ -4,11 +4,11 @@ import com.avocado.fruit.exception.config.RestApiException;
 
 public class ExpiredJwtException extends RestApiException {
 
-    public ExpiredJwtException(String s) {
-        super(s);
+    public ExpiredJwtException(String s, int errorCode) {
+        super(s, errorCode);
     }
 
-    public ExpiredJwtException(String s, Throwable throwable) {
-        super(s, throwable);
+    public ExpiredJwtException(String s, int errorCode, Throwable throwable) {
+        super(s, errorCode, throwable);
     }
 }

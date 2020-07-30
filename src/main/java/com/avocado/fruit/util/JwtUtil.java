@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 public class JwtUtil {
@@ -46,14 +47,14 @@ public class JwtUtil {
                 .getBody();
     }
 
-    public String extractTokenFromHeader(HttpServletRequest request) {
+    public Optional<String> extractTokenFromHeader(HttpServletRequest request) {
         String authHeader = request.getHeader(HeaderConstant.AUTHORIZATION_HEADER_STRING);
         if (authHeader != null) {
             if (authHeader.startsWith(HeaderConstant.TOKEN_BEARER_PREFIX)) {
-                return authHeader.replace(HeaderConstant.TOKEN_BEARER_PREFIX, "");
+                return Optional.of(authHeader.replace(HeaderConstant.TOKEN_BEARER_PREFIX, ""));
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     public SecretKey generateKey() throws NoSuchAlgorithmException {

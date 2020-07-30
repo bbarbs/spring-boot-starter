@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.crypto.SecretKey;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
+import java.util.Optional;
 
 @Component
 @Aspect
@@ -36,10 +37,13 @@ public class AspectLogging {
         String username = null;
         try {
             HttpServletRequest request = (HttpServletRequest) joinPoint.getArgs()[0];
-            String token = jwtUtil.extractTokenFromHeader(request);
-            SecretKey secretKey = (SecretKey) jwtService.getTokenSecretKey(token);
-            Claims claims = jwtUtil.decodeJWT(secretKey, token);
-            username = claims.getSubject();
+            Optional<String> optional = jwtUtil.extractTokenFromHeader(request);
+            if(optional.isPresent()) {
+                String token = optional.get();
+                SecretKey secretKey = (SecretKey) jwtService.getTokenSecretKey(token);
+                Claims claims = jwtUtil.decodeJWT(secretKey, token);
+                username = claims.getSubject();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

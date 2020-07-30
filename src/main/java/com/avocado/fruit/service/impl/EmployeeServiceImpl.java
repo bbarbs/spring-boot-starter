@@ -4,6 +4,7 @@ import com.avocado.fruit.dto.employee.EmployeeMapper;
 import com.avocado.fruit.dto.employee.EmployeeRequest;
 import com.avocado.fruit.dto.employee.EmployeeResponse;
 import com.avocado.fruit.exception.*;
+import com.avocado.fruit.exception.config.ErrorCodes;
 import com.avocado.fruit.model.Employee;
 import com.avocado.fruit.model.Role;
 import com.avocado.fruit.repository.EmployeeRepository;
@@ -43,7 +44,7 @@ public class EmployeeServiceImpl implements UserDetailsService, EmployeeService 
 
     @Override
     public UserDetails loadUserByUsername(String email) {
-        Employee employee = employeeRepository.findByEmail(email).orElseThrow(() -> new BadRequestException("Error validating email"));
+        Employee employee = employeeRepository.findByEmail(email).orElseThrow(() -> new EmployeeNotFoundException("Error authorizing request", ErrorCodes.EMAIL_NOT_FOUND));
         return new User(employee.getEmail(), employee.getPassword(), employee.isEnabled(),
                 true, true, true, getAuthorities(employee.getRoles()));
     }
@@ -64,7 +65,7 @@ public class EmployeeServiceImpl implements UserDetailsService, EmployeeService 
     public EmployeeResponse createEmployee(EmployeeRequest employeeRequest) {
         boolean isEmailExist = employeeRepository.findByEmail(employeeRequest.getEmail()).isPresent();
         if (isEmailExist) {
-            throw new EmailExistsException("Email " + employeeRequest.getEmail() + " already exists");
+            throw new EmailExistsException("Email already exists", ErrorCodes.EMAIL_ALREADY_EXISTS);
         }
         employeeRequest.setPassword(passwordEncoder.encode(employeeRequest.getPassword()));
         Employee employee = employeeRepository.save(employeeMapper.mapToEmployee(employeeRequest));
@@ -74,7 +75,7 @@ public class EmployeeServiceImpl implements UserDetailsService, EmployeeService 
     @Override
     public EmployeeResponse updateEmployeeByID(Long employeeId, EmployeeRequest employeeRequest) {
         if (!employeeId.equals(employeeRequest.getId())) {
-            throw new InconsistentIDException("IDs not match");
+            throw new InconsistentIDException("IDs not match", ErrorCodes.ID_INCONSISTENT);
         }
         employeeRepository.updateEmployee(employeeId, employeeRequest.getEmail(), employeeRequest.getFirstName(), employeeRequest.getLastName());
         return getEmployeeByID(employeeId);
@@ -88,7 +89,7 @@ public class EmployeeServiceImpl implements UserDetailsService, EmployeeService 
 
     @Override
     public EmployeeResponse getEmployeeByID(Long employeeId) {
-        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new EmployeeNotFoundException("Employee not found by ID: " + employeeId));
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(() -> new EmployeeNotFoundException("Employee not found", ErrorCodes.EMPLOYEE_ID_NOT_FOUND));
         return employeeMapper.mapToEmployeeResponse(employee);
     }
 
@@ -100,7 +101,7 @@ public class EmployeeServiceImpl implements UserDetailsService, EmployeeService 
 
     @Override
     public EmployeeResponse getEmployeeByEmail(String email) {
-        Employee employee = employeeRepository.findByEmail(email).orElseThrow(() -> new EmployeeNotFoundException("Employee not found by email: " + email));
+        Employee employee = employeeRepository.findByEmail(email).orElseThrow(() -> new EmployeeNotFoundException("Employee not found", ErrorCodes.EMAIL_NOT_FOUND));
         return employeeMapper.mapToEmployeeResponse(employee);
     }
 }

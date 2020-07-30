@@ -1,5 +1,6 @@
 package com.avocado.fruit.security;
 
+import com.avocado.fruit.exception.config.ErrorCodes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.avocado.fruit.dto.login.LoginRequest;
 import com.avocado.fruit.dto.login.LoginResponse;
@@ -51,7 +52,8 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
             ));
         } catch (Exception e) {
             try {
-                response.getWriter().write(new Gson().toJson(createExceptionMessage(e.getMessage())));
+                response.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
+                response.getWriter().write(new Gson().toJson(createExceptionMessage()));
                 return null;
             } catch (IOException ex) {
                 throw new RuntimeException(e);
@@ -59,12 +61,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         }
     }
 
-    private RestExceptionMessage createExceptionMessage(String message) {
+    private RestExceptionMessage createExceptionMessage() {
         return RestExceptionMessage.builder()
                 .timestamp(new Date())
                 .httpStatus(HttpStatus.INTERNAL_SERVER_ERROR)
                 .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .error(new ErrorMessage(message))
+                .error(new ErrorMessage(ErrorCodes.INVALID_EMAIL_OR_PASSWORD, "Invalid email or password"))
                 .build();
     }
 
